@@ -1,0 +1,23 @@
+{
+  "name": "node-red-contrib-syslog-input",
+  "version": "1.0.0",
+  "description": "Node Red syslogd server node",
+  "main": "src/syslogd.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "eslint": "eslint --fix ."
+  },
+  "node-red": {
+    "nodes": {
+      "syslog-input": "src/syslogd.js"
+    }
+  },
+  "author": "",
+  "license": "Apache-2.0",
+  "dependencies": {
+    "simple-syslog-server": "^1.0.0"
+  },
+  "devDependencies": {
+    "eslint": "^5.9.0"
+  }
+}

@@ -1,0 +1,250 @@
+
+<!--
+  ~ Copyright (c) 2019 Damien Clark
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~    you may not use this file except in compliance with the License.
+  ~    You may obtain a copy of the License at
+  ~
+  ~        http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~    Unless required by applicable law or agreed to in writing, software
+  ~    distributed under the License is distributed on an "AS IS" BASIS,
+  ~    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~    See the License for the specific language governing permissions and
+  ~    limitations under the License.
+  ~
+  -->
+
+<script type="text/x-red" data-template-name="syslog-input">
+    <div class="form-row">
+        <label for="node-input-socktype"><i class="fa fa-dot-circle-o"></i> Protocol</label>
+        <select id="node-input-socktype" style="width:75px; margin-right:5px;">
+            <option value="udp">UDP</option>
+            <option value="tcp">TCP</option>
+        </select>
+        <span>Port</span> <input type="text" id="node-input-port" style="width:65px">
+    </div>
+
+    <div class="form-row">
+        <label for="node-input-address"><i class="fa fa-plug"></i> Listen</label>
+        <input type="text" id="node-input-address" placeholder="0.0.0.0" style="width: 60%;">
+    </div>
+
+    <div class="form-row">
+        <label for="node-input-topic"><i class="fa fa-tasks"></i> Topic</label>
+        <input type="text" id="node-input-topic"/>
+    </div>
+    <div class="form-row">
+        <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+        <input type="text" id="node-input-name"/>
+    </div>
+</script>
+
+<script type="text/x-red" data-help-name="syslog-input">
+<p>Input node that receives syslog messages from remote systems using UDP or TCP transport protocols.</p>
+<p>
+    <b>Note: </b>On some systems you may need root or administrator access
+    to access ports below 1024.
+</p>
+
+ <h3>Outputs</h3>
+     <dl class="message-properties">
+         <dt>payload <span class="property-type">object</span></dt>
+         <dd>
+            <p>The syslog message broken down into properties, as per example below.</p>
+            <pre>
+{
+  "facility": "daemon",
+  "facilityCode": 3,
+  "severity": "info",
+  "severityCode": 6,
+  "tag": "systemd[1]",
+  "timestamp": "2018-12-26T17:53:57.000Z",
+  "hostname": "localhost",
+  "address": "::ffff:192.168.147.131",
+  "family": "IPv6",
+  "port": 38514,
+  "size": 80,
+  "msg": "Started Daily apt download activities."
+}
+            </pre>
+          </dd>
+         <dt>topic <span class="property-type">string</span></dt>
+         <dd>
+            <p>For each message, the topic is set to the tag, without any optional process ids, as
+            per example below.</p>
+            <pre>
+{
+  "payload": {
+    ...
+    "tag": "systemd[1]",
+    ...
+  },
+  "topic": "systemd"
+}
+            </pre>
+         </dd>
+     </dl>
+
+<h3>Details</h3>
+    <h4>Outputs</h4>
+        <p>
+            <code>msg.payload</code> holds the syslog message received from the remote
+            end-point. It is parsed, and structured into a javascript object.  All property values
+            are either an <code>integer</code> or <code>string</code> datatype, with the exception of the <code>timestamp</code>
+            property.  This property is a native javascript <code>DateTime</code> object.
+        </p>
+
+        <p>
+            Meanwhile, <code>msg.topic</code> holds the <code>tag</code> value from the syslog message,
+            but with any process id value and enclosing square braces (e.g. <code>[1]</code>) removed.
+            This makes it easy to categorise syslog messages according to the application than generated
+            them.
+        </p>
+    <h4>Description of Syslog Message Fields</h4>
+        <dl>
+            <dt>facility and facilityCode</dt>
+            <dd><p>The <i>facility</i> argument is used to specify what type of program is logging the message.
+            This lets the configuration file specify that messages from different facilities will be handled
+            differently.</p>
+            <p>There is a <a target="_blank" href="https://en.wikipedia.org/wiki/Syslog#Facility">definitive
+            list</a> of facilities for syslog. This list can assist you to filter received syslog messages
+             to the ones that most interest you.</p></dd>
+            <dt>severity and severityCode</dt>
+            <dd>
+                <p>There are 8 severity levels.  They are:</p>
+                <ol start=0>
+                    <li>Emergency</li>
+                    <li>Alert</li>
+                    <li>Critical</li>
+                    <li>Error</li>
+                    <li>Warning</li>
+                    <li>Notice</li>
+                    <li>Informational</li>
+                    <li>Debug</li>
+                </ol>
+                <p>The meaning of severity levels other than <i>Emergency</i> and <i>Debug</i> are relative
+                to the application. Further information on the severity levels is available from
+                <a target="_blank" href="https://en.wikipedia.org/wiki/Syslog#Severity_level">wikipedia</a>.</p>
+            </dd>
+            <dt>tag</dt>
+            <dd>
+            <p>From <a target="_blank" href="https://tools.ietf.org/html/rfc3164#section-5.3">
+            RFC3164</a>:</p>
+            <blockquote>It has also been considered to be a good practice to include some
+            information about the process on the device that generated the
+            message - if that concept exists.  This is usually the process name
+            and process id (often known as the "pid") for robust operating
+            systems.  The process name is commonly displayed in the TAG field.
+            ... The format of "TAG[pid]:" - without the quote
+            marks - is common.  The left square bracket is used to terminate the
+            TAG field in this case and is then the first character in the CONTENT
+            field.  If the process id is immaterial, it may be left off.   </blockquote>
+            <p>So depending on the software, sometimes the tag field value will have a trailing
+            process id in square brackets, while other times, it won't.
+            </dd>
+            <dt>timestamp</dt>
+            <dd><p><code>timestamp</code> will store the date and time of the message from the source.
+            The timestamp records when the message was created, not when it was received.  It
+            will be stored as a native Javascript <code>DateTime</code> object.</p>
+            <p><b>Please Note: </b>Many syslog
+            implementations do not include the year in the timestamp value. In such cases,
+            this node will assume the current year.  This is important to note when processing
+            historical syslog messages that may have been generated in previous years. You will
+            need to take this into consideration. </p></dd>
+            <dt>hostname</dt>
+            <dd><p>The hostname is included in the message sent from the application. It is not determined
+            by the IP address of the remote host, but rather by the local configuration on the sending
+            device.  If the sending device does not have an explicitly configured hostname, <code>localhost
+            </code> is commonly used. </p></dd>
+            <dt>address</dt>
+            <dd><p>This field records the IP address of the host that sent or forwarded the message to
+            your node as a string. It is important to recognise that syslog supports message forwarding and that
+            this field value may not necessarily match the originator of the message, but instead the
+            last syslog server host to forward on the message. </p></dd>
+            <dt>family</dt>
+            <dd><p>The network protocol family representing the IP address is provided by this field.  Typically, it
+            will be either <code>IPv4</code> or <code>IPv6</code>.</p></dd>
+            <dt>port</dt>
+            <dd><p>This field represents the TCP or UDP transport protocol port number the message was received
+            on as per your node configuration. </p></dd>
+            <dt>size</dt>
+            <dd><p><code>size</code> will store the size of the entire encoded syslog message. This field is
+            included for completeness, but provides little utility.</p></dd>
+            <dt>msg</dt>
+            <dd><p>The <code>msg</code> field holds the actual text message sent from the remote application. </p></dd>
+        </dl>
+
+<h3>Syslog Source Host Configuration</h3>
+
+<p><a href="">Rsyslog</a> is a very popular open source syslog server for GNU/Linux and comes pre-installed and
+configured on many distributions.  It can be changed such that, in addition to logging messages locally to files,
+it can also <a target="_blank" href="https://www.rsyslog.com/doc/v8-stable/configuration/modules/omfwd.html">send
+syslog messages to a remote host</a>, such as your Node Red server. A quick synopsis of making this configuration
+change is shown below.</p>
+
+<p>Simply edit the <code>/etc/rsyslog.conf</code> file, and add the following lines. Editing this file will require
+root privileges, so don&apos;t forget to use <code>sudo</code>.</p>
+
+<pre>
+#Write all messages to remote syslog using tcp port 20514
+*.*  action(type="omfwd" target="192.168.1.8" port="20514" protocol="tcp"
+            action.resumeRetryCount="-1"
+            queue.type="linkedList" queue.size="50000")
+</pre>
+
+<p>The above configuration will send messages of all facilities and all priorities (i.e. *.*) to the IP address
+192.168.1.8 using the TCP transport protocol. If messages can't be delivered to that IP and port number, then
+messages will be locally stored in the meantime up to a total of 50,000 messages. Once it is able to connect,
+messages stored locally will be forwarded.
+
+<p>Replace <code>192.168.1.8</code> with the IP address of your Node Red Server.</p>
+
+<p><b>Note:</b> you will also need to restart your rsyslog server software. Most modern Linux distributions can
+do this with the following command:</p>
+
+<code>$ sudo systemctl restart rsyslog</code>
+
+<p>If you prefer not to queue undelivered messages, use the following configuration.</p>
+
+<pre>
+#Write all messages to remote syslog using tcp port 20514
+*.*  action(type="omfwd" target="192.168.1.8" port="20514" protocol="udp"
+            queue.type="direct")
+</pre>
+
+<p>Don&apos;t forget to change your node to use UDP instead of TCP</p>
+
+<h3>References</h3>
+    <ul>
+        <li><a target="_blank" href="https://tools.ietf.org/html/rfc3164#section-4">Syslog Message Format - RFC3164</a></li>
+        <li><a target="_blank" href="https://en.wikipedia.org/wiki/Syslog">Wikipedia Syslog Page</a></li>
+        <li><a target="_blank" href="https://www.rsyslog.com/doc/v8-stable/configuration/modules/omfwd.html">Rsyslog Message Forwarding Options</a></li>
+    </ul>
+    <p></p>
+</script>
+
+<script type="text/javascript">
+	RED.nodes.registerType('syslog-input',{
+		category: 'input',
+		color:"#FFAAAA",
+		defaults: {
+			name: {value:"syslog"},
+            socktype: {value:"udp"},
+			address: {value:""},
+			port: {value:20514,required:true,validate:RED.validators.number()},
+			topic: {value:""},
+        },
+		inputs:0,
+		outputs:1,
+		icon: "rsyslog-logo-small.png",
+		label: function() {
+			return this.name || "syslog-input:"+(this.address?this.address+":":"")+this.port;
+		},
+		labelStyle: function() {
+			return this.name?"node_label_italic":"";
+		}
+	});
+</script>
+
