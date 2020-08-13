@@ -38,7 +38,7 @@ The node supports both the UDP and TCP transport protocols.  TCP is generally a 
 
 Once you have selected a transport protocol, you need to specify a TCP/UDP port number to listen for requests, and the IP address that you wish to listen on.  
 
-**Note:** The standard port number for the syslog protocol is 512.  On some systems, you may need to run your node-red as root or administrator to access ports below 1024.  This is strongly discouraged.  Thus, it is best to specify a port number above 1024.  Port 20514 is a good choice.
+**Note:** The standard port number for the syslog protocol is 514.  On some systems, you may need to run your node-red as root or administrator to access ports below 1024.  This is strongly discouraged.  Thus, it is best to specify a port number above 1024.  Port 20514 is a good choice.
 
 Finally, you need to specify which IP address you wish to _bind_ or _listen_ to for syslog messages. If you leave the IP address blank, then the node will requests for requests on all IP addresses.  This is important if your server has multiple networks, or if you will be receiving messages from both the network, and the built-in localhost interface.  localhost is only accessible to programs running on the local machine.  
 
@@ -170,7 +170,7 @@ If your Node Red server only has one network connection, then you can safely lea
 
 ![Root permissions required](https://www.evernote.com/l/AF18fHGlKHVGYp70lVPD7Rew8vpnpuYm8L4B/image.png "EACCESS")
 
-This error indicates that the port number 512 is privileged and requires root permissions to listen upon.  While you can run your node-red server as root, this is strongly discouraged for security reasons.  Instead, change your port number to one above 1024.  20514 is a simple option.
+This error indicates that the port number 514 is privileged and requires root permissions to listen upon.  While you can run your node-red server as root, this is strongly discouraged for security reasons.  Instead, change your port number to one above 1024.  20514 is a simple option.
 
 ## Licence
 Copyright (c) 2019 Damien Clark
