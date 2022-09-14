@@ -1,6 +1,8 @@
 # node-red-contrib-syslog-input
 
 A simple contributed Node-RED node, for receiving remote logging messages using the ubiquitous [syslog](https://www.networkmanagementsoftware.com/what-is-syslog/) event logging protocol.
+Difference with original syslog-input module - processing of broken/incomplete messages. Original version just discard this.
+if paiload is broken - msg contained unparsed value and topic = 'broken'  
 
 ## Overview
 The goal of this software is to make it easy for home IOT mavericks to respond to almost any computer system software event via the awesome [Node-RED Framework](https://nodered.org/ "Node Red").

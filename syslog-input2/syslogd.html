@@ -16,7 +16,7 @@
   ~
   -->
 
-<script type="text/x-red" data-template-name="syslog-input">
+<script type="text/x-red" data-template-name="syslog-input2">
     <div class="form-row">
         <label for="node-input-socktype"><i class="fa fa-dot-circle-o"></i> Protocol</label>
         <select id="node-input-socktype" style="width:75px; margin-right:5px;">
@@ -41,12 +41,14 @@
     </div>
 </script>
 
-<script type="text/x-red" data-help-name="syslog-input">
+<script type="text/x-red" data-help-name="syslog-input2">
 <p>Input node that receives syslog messages from remote systems using UDP or TCP transport protocols.</p>
 <p>
     <b>Note: </b>On some systems you may need root or administrator access
     to access ports below 1024.
 </p>
+
+<p>Difference with original syslog-input module - processing of broken/incomplete messages. Original version just discard this.</p>
 
  <h3>Outputs</h3>
      <dl class="message-properties">
@@ -226,7 +228,7 @@ do this with the following command:</p>
 </script>
 
 <script type="text/javascript">
-	RED.nodes.registerType('syslog-input',{
+	RED.nodes.registerType('syslog-input2',{
 		category: 'input',
 		color:"#FFAAAA",
 		defaults: {
@@ -240,7 +242,7 @@ do this with the following command:</p>
 		outputs:1,
 		icon: "rsyslog-logo-small.png",
 		label: function() {
-			return this.name || "syslog-input:"+(this.address?this.address+":":"")+this.port;
+			return this.name || "syslog-input2:"+(this.address?this.address+":":"")+this.port;
 		},
 		labelStyle: function() {
 			return this.name?"node_label_italic":"";

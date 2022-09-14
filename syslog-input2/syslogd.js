@@ -56,7 +56,13 @@ module.exports = function(RED) {
 			status(this) ;
 		})
 		.on('invalid', err => {
-			this.warn(`Invalid message received: ${JSON.stringify(err)}`) ;
+			this.count++ ;
+			var msg = {
+				payload: err,
+				topic: 'broken'
+			} ;
+			this.send(msg) ;
+			status(this) ;
 		})
 		.on('error', err => {
 			this.listening = false ;
@@ -149,6 +155,6 @@ module.exports = function(RED) {
 		node.status(node.stat) ;
 	}
 
-	RED.nodes.registerType('syslog-input', SyslogInputNode) ;
+	RED.nodes.registerType('syslog-input2', SyslogInputNode) ;
 
 } ;

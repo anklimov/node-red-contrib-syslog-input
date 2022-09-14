@@ -1,7 +1,7 @@
 {
-  "name": "node-red-contrib-syslog-input",
-  "version": "1.0.0",
-  "description": "Node Red syslogd server node",
+  "name": "node-red-contrib-syslog-input2",
+  "version": "1.0.4",
+  "description": "Node Red syslogd server node with processing invalid messages enabled",
   "main": "src/syslogd.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -9,12 +9,17 @@
   },
   "node-red": {
     "nodes": {
-      "syslog-input": "src/syslogd.js"
+      "syslog-input": "syslog-input2/syslogd.js"
     }
   },
+  "keywords": [
+    "node-red"
+  ],
   "author": "",
   "license": "Apache-2.0",
   "dependencies": {
+    "node-red-contrib-syslog-input": "^1.0.1",
+    "node-red-contrib-syslog-input2": "^1.0.3",
     "simple-syslog-server": "^1.0.0"
   },
   "devDependencies": {
